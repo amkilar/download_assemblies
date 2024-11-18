@@ -1,4 +1,4 @@
-DATABASE = '"Rhodophyta"[Organism] AND (latest[filter] AND "reference genome"[filter] AND all[filter] NOT anomalous[filter])'
+DATABASE = '"Enoplea"[Organism] AND (latest[filter] AND "reference genome"[filter] AND all[filter] NOT anomalous[filter])'
 
 rule all:
     input:  "downloaded_genomes_and_tax.csv"
