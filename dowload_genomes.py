@@ -1,11 +1,4 @@
-# module add Mambaforge
-# mamba activate /n/home10/akilar/software/env_snakemake
-# snakemake -s dowload_genomes.py --cores 32 --use-conda 
-
-
-DATABASE = '"Nematoda"[Organism] AND (latest[filter] AND "representative genome"[filter] AND all[filter] NOT anomalous[filter])'
-#DATABASE = '"Nematoda"[Organism]'
-
+DATABASE = '"Rhodophyta"[Organism] AND (latest[filter] AND "reference genome"[filter] AND all[filter] NOT anomalous[filter])'
 
 rule all:
     input:  "downloaded_genomes_and_tax.csv"
@@ -64,7 +57,7 @@ class Checkpoint_MakePattern:
 
 
 rule download_genome:
-    output: touch("database/{genome}/{genome}.fna.gz")
+    output: "database/{genome}.fna.gz"
     
     input:  "temp/{genome}"
 
@@ -77,13 +70,15 @@ rule download_genome:
         rsync -q -av \
         $ADAPTED_LINK \
         ./database/{wildcards.genome}
+        
+        sleep 5
 
         """
 
 rule unzip_genome:
-   output: "database/{genome}/{genome}.fna"
+   output: "database/{genome}.fna"
 
-   input:  "database/{genome}/{genome}.fna.gz"
+   input:  "database/{genome}.fna.gz"
    
    shell:
        r"""
@@ -94,7 +89,7 @@ rule search_taxonomy:
     output: "taxonomy/{genome}.taxonomy.row.csv"
 
     input:  script = "scripts/search_taxonomy.r",
-            genome = "database/{genome}/{genome}.fna"
+            genome = "database/{genome}.fna"
 
     conda:  "env/search_taxonomy.yaml"        
 
@@ -103,7 +98,7 @@ rule search_taxonomy:
 
 rule wrap_up:
     output: "download_genomes.txt"
-    input:  Checkpoint_MakePattern("database/{name}/{name}.fna")
+    input:  Checkpoint_MakePattern("database/{name}.fna")
 
     shell:
         r"""
@@ -119,9 +114,3 @@ rule add_taxonomy:
         r"""
         cat {input} >> {output}
         """
-
-
-
-
-
-
